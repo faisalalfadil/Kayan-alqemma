@@ -10,6 +10,21 @@ const contactSchema = z.object({
   message: z.string().min(10, 'الرسالة يجب أن تكون 10 أحرف على الأقل'),
 })
 
+export async function GET() {
+  try {
+    const messages = await db.contactMessage.findMany({
+      orderBy: { createdAt: 'desc' },
+      take: 50,
+    })
+    return NextResponse.json({ success: true, data: messages })
+  } catch {
+    return NextResponse.json(
+      { success: false, error: 'فشل في جلب الرسائل' },
+      { status: 500 }
+    )
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
