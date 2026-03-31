@@ -1,0 +1,109 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model BlogPost {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  excerpt     String?
+  content     String
+  coverImage  String?
+  metaDescription String?
+  published   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Project {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  image       String?
+  category    String?
+  clientName  String?
+  location    String?
+  completedAt DateTime?
+  featured    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+}
+
+model Service {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  icon        String?
+  features    String?
+  order       Int      @default(0)
+}
+
+model FAQ {
+  id          String   @id @default(cuid())
+  question    String
+  answer      String
+  category    String?
+  order       Int      @default(0)
+}
+
+model ContactMessage {
+  id          String   @id @default(cuid())
+  name        String
+  email       String
+  phone       String?
+  subject     String?
+  message     String
+  read        Boolean  @default(false)
+  createdAt   DateTime @default(now())
+}
+
+model Testimonial {
+  id          String   @id @default(cuid())
+  name        String
+  role        String?
+  content     String
+  rating      Int
+  avatar      String?
+}
+
+model Newsletter {
+  id          String   @id @default(cuid())
+  email       String   @unique
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+}
+
+model Appointment {
+  id          String   @id @default(cuid())
+  name        String
+  phone       String
+  email       String?
+  serviceType String
+  date        String
+  time        String
+  notes       String?
+  status      String   @default("pending")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model SeoSetting {
+  id          String   @id @default(cuid())
+  page        String   @unique
+  title       String
+  description String
+  keywords    String?
+  ogTitle     String?
+  ogDescription String?
+  ogImage     String?
+  canonicalUrl String?
+  robots      String   @default("index, follow")
+  schema      String?
+  focusKeyword String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
