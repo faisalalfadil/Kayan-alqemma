@@ -1,22 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 
-export async function GET() {
+export default async function handler(req, res) {
   try {
-    const subscribers = await db.newsletter.findMany({
-      orderBy: { createdAt: 'desc' },
-    })
+    // كل الكود هنا فقط 👇
 
-    return NextResponse.json({
-      success: true,
-      data: subscribers,
-      count: subscribers.length,
-    })
-  } catch {
-    return NextResponse.json(
-      { success: false, message: 'حدث خطأ في تحميل المشتركين' },
-      { status: 500 }
-    )
+    return res.status(200).json({ message: "OK" });
+
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Server error" });
   }
 }
 
