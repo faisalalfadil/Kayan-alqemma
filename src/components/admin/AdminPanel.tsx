@@ -77,6 +77,8 @@ import {
   Phone,
   MessageSquare,
   Clock,
+  Settings,
+  Save,
 } from 'lucide-react'
 
 // ===================== TYPES =====================
@@ -179,6 +181,7 @@ const NAV_ITEMS = [
   { id: 'projects', label: 'المشاريع', icon: FolderOpen },
   { id: 'faq', label: 'الأسئلة الشائعة', icon: HelpCircle },
   { id: 'messages', label: 'الرسائل', icon: Mail },
+  { id: 'settings', label: 'الإعدادات', icon: Settings },
 ]
 
 const PROJECT_CATEGORIES = [
@@ -1825,6 +1828,277 @@ function MessagesTab() {
   )
 }
 
+// ===================== SETTINGS TAB =====================
+
+function SettingsTab() {
+  const [settings, setSettings] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+  const [form, setForm] = useState({
+    siteName: '',
+    phone: '',
+    email: '',
+    address: '',
+    workingHours: '',
+    whatsapp: '',
+    twitter: '',
+    instagram: '',
+    linkedin: '',
+    description: '',
+    chatbotPrompt: '',
+  })
+
+  const fetchSettings = useCallback(async () => {
+    try {
+      const res = await fetch('/api/settings')
+      if (!res.ok) throw new Error('Failed')
+      const data = await res.json()
+      if (data.success && data.data) {
+        setSettings(data.data)
+        setForm({
+          siteName: data.data.siteName || '',
+          phone: data.data.phone || '',
+          email: data.data.email || '',
+          address: data.data.address || '',
+          workingHours: data.data.workingHours || '',
+          whatsapp: data.data.whatsapp || '',
+          twitter: data.data.twitter || '',
+          instagram: data.data.instagram || '',
+          linkedin: data.data.linkedin || '',
+          description: data.data.description || '',
+          chatbotPrompt: data.data.chatbotPrompt || '',
+        })
+      }
+    } catch {
+      toast.error('فشل في تحميل الإعدادات')
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    fetchSettings()
+  }, [fetchSettings])
+
+  const handleSave = async () => {
+    setSaving(true)
+    try {
+      const res = await fetch('/api/settings', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      })
+      if (!res.ok) throw new Error('Save failed')
+      const data = await res.json()
+      if (data.success) {
+        toast.success('تم حفظ الإعدادات بنجاح')
+        fetchSettings()
+      } else {
+        throw new Error(data.error || 'Save failed')
+      }
+    } catch (error) {
+      toast.error('فشل في حفظ الإعدادات')
+      console.error('Settings save error:', error)
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="space-y-4">
+        <Skeleton className="h-10 w-48" />
+        {[1, 2, 3, 4].map((i) => (
+          <Skeleton key={i} className="h-20 rounded-lg" />
+        ))}
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h2 className="text-lg font-semibold">إعدادات الموقع</h2>
+        <Button
+          onClick={handleSave}
+          disabled={saving}
+          className="bg-blue-600 hover:bg-blue-700"
+        >
+          {saving ? (
+            <Loader2 className="w-4 h-4 ml-1 animate-spin" />
+          ) : (
+            <Save className="w-4 h-4 ml-1" />
+          )}
+          حفظ التغييرات
+        </Button>
+      </div>
+
+      <Card className="border-0 shadow-sm">
+        <CardContent className="p-6 space-y-6">
+          {/* معلومات الشركة */}
+          <div className="space-y-4">
+            <h3 className="text-base font-semibold text-[#0f172a] flex items-center gap-2">
+              <Shield className="w-4 h-4" />
+              معلومات الشركة
+            </h3>
+            <Separator />
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>اسم الشركة</Label>
+                <Input
+                  value={form.siteName}
+                  onChange={(e) => setForm((f) => ({ ...f, siteName: e.target.value }))}
+                  placeholder="شركة كيان القمة"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label>رقم الهاتف</Label>
+                <Input
+                  value={form.phone}
+                  onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
+                  placeholder="+966 50 123 4567"
+                  dir="ltr"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label>البريد الإلكتروني</Label>
+                <Input
+                  type="email"
+                  value={form.email}
+                  onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
+                  placeholder="info@kayan-alaqma.sa"
+                  dir="ltr"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label>رقم الواتساب</Label>
+                <Input
+                  value={form.whatsapp}
+                  onChange={(e) => setForm((f) => ({ ...f, whatsapp: e.target.value }))}
+                  placeholder="966501234567"
+                  dir="ltr"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label>العنوان</Label>
+              <Input
+                value={form.address}
+                onChange={(e) => setForm((f) => ({ ...f, address: e.target.value }))}
+                placeholder="طريق الملك فهد، حي العليا، الرياض"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>ساعات العمل</Label>
+              <Input
+                value={form.workingHours}
+                onChange={(e) => setForm((f) => ({ ...f, workingHours: e.target.value }))}
+                placeholder="السبت - الخميس: 8 صباحًا - 6 مساءً"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>وصف الشركة</Label>
+              <Textarea
+                value={form.description}
+                onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
+                placeholder="وصف مختصر عن الشركة"
+                rows={3}
+              />
+            </div>
+          </div>
+
+          {/* روابط التواصل الاجتماعي */}
+          <div className="space-y-4">
+            <h3 className="text-base font-semibold text-[#0f172a] flex items-center gap-2">
+              <MessageSquare className="w-4 h-4" />
+              روابط التواصل الاجتماعي
+            </h3>
+            <Separator />
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>تويتر (X)</Label>
+                <Input
+                  value={form.twitter}
+                  onChange={(e) => setForm((f) => ({ ...f, twitter: e.target.value }))}
+                  placeholder="https://twitter.com/kayan_alaqma"
+                  dir="ltr"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label>إنستغرام</Label>
+                <Input
+                  value={form.instagram}
+                  onChange={(e) => setForm((f) => ({ ...f, instagram: e.target.value }))}
+                  placeholder="https://instagram.com/kayan_alaqma"
+                  dir="ltr"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label>لينكد إن</Label>
+                <Input
+                  value={form.linkedin}
+                  onChange={(e) => setForm((f) => ({ ...f, linkedin: e.target.value }))}
+                  placeholder="https://linkedin.com/company/kayan_alaqma"
+                  dir="ltr"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* إعدادات الشات بوت */}
+          <div className="space-y-4">
+            <h3 className="text-base font-semibold text-[#0f172a] flex items-center gap-2">
+              <MessageSquare className="w-4 h-4" />
+              إعدادات الشات بوت
+            </h3>
+            <Separator />
+
+            <div className="space-y-2">
+              <Label>تعليمات إضافية للشات بوت</Label>
+              <Textarea
+                value={form.chatbotPrompt}
+                onChange={(e) => setForm((f) => ({ ...f, chatbotPrompt: e.target.value }))}
+                placeholder="أضف تعليمات خاصة للشات بوت (اختياري)"
+                rows={4}
+              />
+              <p className="text-xs text-muted-foreground">
+                يمكنك إضافة تعليمات إضافية لتخصيص سلوك الشات بوت
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* زر الحفظ السفلي */}
+      <div className="flex justify-end">
+        <Button
+          onClick={handleSave}
+          disabled={saving}
+          size="lg"
+          className="bg-blue-600 hover:bg-blue-700"
+        >
+          {saving ? (
+            <Loader2 className="w-4 h-4 ml-2 animate-spin" />
+          ) : (
+            <Save className="w-4 h-4 ml-2" />
+          )}
+          حفظ جميع التغييرات
+        </Button>
+      </div>
+    </div>
+  )
+}
+
 // ===================== SIDEBAR =====================
 
 function Sidebar({
@@ -1989,6 +2263,8 @@ export default function AdminPanel() {
         return <FAQTab />
       case 'messages':
         return <MessagesTab />
+      case 'settings':
+        return <SettingsTab />
       default:
         return <DashboardTab />
     }
