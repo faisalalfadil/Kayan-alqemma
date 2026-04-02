@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 
-async function seedDatabase() {
+export async function POST() {
   try {
     const blogCount = await db.blogPost.count()
     const testimonialCount = await db.testimonial.count()
@@ -65,12 +65,4 @@ async function seedDatabase() {
     console.error('Seed error:', error)
     return NextResponse.json({ success: false, message: 'Seed failed' }, { status: 500 })
   }
-}
-
-export async function GET() {
-  return seedDatabase()
-}
-
-export async function POST() {
-  return seedDatabase()
 }

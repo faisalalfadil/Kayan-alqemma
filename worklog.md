@@ -38,3 +38,33 @@ Stage Summary:
 - Chatbot works with intelligent Arabic fallback responses
 - Settings are now persisted to database via Prisma
 - The dev server starts and compiles successfully (returns 200)
+
+---
+Task ID: 2
+Agent: Main Agent
+Task: Migrate database from SQLite to Neon PostgreSQL
+
+Work Log:
+- Updated .env DATABASE_URL to Neon PostgreSQL connection string
+- Changed Prisma schema provider from "sqlite" to "postgresql"
+- Fixed .config file conflict (JuiceFS config mistaken by Prisma) - renamed to .juicefs-config
+- Ran `prisma generate` to regenerate Prisma Client for PostgreSQL
+- Ran `prisma db push` to create all tables in Neon PostgreSQL (11 models: SiteSettings, BlogPost, Project, Service, FAQ, ContactMessage, Testimonial, Newsletter, Appointment, SeoSetting)
+- Ran seed script to populate database with all data
+- Verified all 7 API endpoints work with PostgreSQL:
+  - Settings: ✅ (from Neon PostgreSQL)
+  - Services: ✅ (6 items)
+  - Projects: ✅ (6 items)
+  - Blog: ✅ (6 items)
+  - Testimonials: ✅ (6 items)
+  - FAQs: ✅ (8 items)
+  - Chat: ✅ (reading settings from PostgreSQL)
+- Ran lint - no errors
+- Dev log confirms PostgreSQL queries: SELECT "public"."SiteSettings"...
+
+Stage Summary:
+- Database successfully migrated from SQLite to Neon PostgreSQL
+- All tables created in Neon cloud database (eu-central-1 region)
+- All data seeded: 6 services, 8 FAQs, 6 projects, 6 blog posts, 6 testimonials, 1 site settings
+- All API endpoints verified working with PostgreSQL backend
+- No code changes needed beyond schema provider switch

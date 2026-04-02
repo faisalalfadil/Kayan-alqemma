@@ -14,8 +14,6 @@ const settingsSchema = z.object({
   linkedin: z.string().optional(),
   description: z.string().optional(),
   chatbotPrompt: z.string().optional(),
-  logo: z.string().optional(),
-  favicon: z.string().optional(),
 });
 
 export async function GET() {
