@@ -1834,6 +1834,10 @@ function SettingsTab() {
   const [settings, setSettings] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [uploadingLogo, setUploadingLogo] = useState(false)
+  const [uploadingFavicon, setUploadingFavicon] = useState(false)
+  const logoInputRef = useRef<HTMLInputElement>(null)
+  const faviconInputRef = useRef<HTMLInputElement>(null)
   const [form, setForm] = useState({
     siteName: '',
     phone: '',
@@ -1846,6 +1850,8 @@ function SettingsTab() {
     linkedin: '',
     description: '',
     chatbotPrompt: '',
+    logo: '',
+    favicon: '',
   })
 
   const fetchSettings = useCallback(async () => {
@@ -1867,6 +1873,8 @@ function SettingsTab() {
           linkedin: data.data.linkedin || '',
           description: data.data.description || '',
           chatbotPrompt: data.data.chatbotPrompt || '',
+          logo: data.data.logo || '',
+          favicon: data.data.favicon || '',
         })
       }
     } catch {
@@ -1879,6 +1887,52 @@ function SettingsTab() {
   useEffect(() => {
     fetchSettings()
   }, [fetchSettings])
+
+  const handleUploadLogo = async (file: File) => {
+    setUploadingLogo(true)
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+      formData.append('category', 'logo')
+      const res = await fetch('/api/admin/upload', {
+        method: 'POST',
+        body: formData,
+      })
+      if (!res.ok) throw new Error('Upload failed')
+      const data = await res.json()
+      if (data.url) {
+        setForm((f) => ({ ...f, logo: data.url }))
+        toast.success('تم رفع الشعار بنجاح')
+      }
+    } catch {
+      toast.error('فشل في رفع الشعار')
+    } finally {
+      setUploadingLogo(false)
+    }
+  }
+
+  const handleUploadFavicon = async (file: File) => {
+    setUploadingFavicon(true)
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+      formData.append('category', 'favicon')
+      const res = await fetch('/api/admin/upload', {
+        method: 'POST',
+        body: formData,
+      })
+      if (!res.ok) throw new Error('Upload failed')
+      const data = await res.json()
+      if (data.url) {
+        setForm((f) => ({ ...f, favicon: data.url }))
+        toast.success('تم رفع الأيقونة بنجاح')
+      }
+    } catch {
+      toast.error('فشل في رفع الأيقونة')
+    } finally {
+      setUploadingFavicon(false)
+    }
+  }
 
   const handleSave = async () => {
     setSaving(true)
@@ -1935,6 +1989,113 @@ function SettingsTab() {
 
       <Card className="border-0 shadow-sm">
         <CardContent className="p-6 space-y-6">
+          {/* الشعار والأيقونة */}
+          <div className="space-y-4">
+            <h3 className="text-base font-semibold text-[#0f172a] flex items-center gap-2">
+              <ImageIcon className="w-4 h-4" />
+              الشعار والأيقونة
+            </h3>
+            <Separator />
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Logo */}
+              <div className="space-y-3">
+                <Label>شعار الشركة</Label>
+                {form.logo && (
+                  <div className="relative w-full h-32 rounded-lg overflow-hidden border bg-gray-50 flex items-center justify-center">
+                    <img
+                      src={form.logo}
+                      alt="Logo"
+                      className="max-w-full max-h-full object-contain p-2"
+                    />
+                    <button
+                      onClick={() => setForm((f) => ({ ...f, logo: '' }))}
+                      className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1.5 transition-colors"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </div>
+                )}
+                <div>
+                  <input
+                    ref={logoInputRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0]
+                      if (file) handleUploadLogo(file)
+                    }}
+                  />
+                  <Button
+                    variant="outline"
+                    onClick={() => logoInputRef.current?.click()}
+                    disabled={uploadingLogo}
+                    className="w-full"
+                  >
+                    {uploadingLogo ? (
+                      <Loader2 className="w-4 h-4 ml-2 animate-spin" />
+                    ) : (
+                      <Upload className="w-4 h-4 ml-2" />
+                    )}
+                    {uploadingLogo ? 'جاري الرفع...' : 'رفع شعار'}
+                  </Button>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    يفضل PNG بخلفية شفافة (حجم موصى به: 200x60 بكسل)
+                  </p>
+                </div>
+              </div>
+
+              {/* Favicon */}
+              <div className="space-y-3">
+                <Label>أيقونة الموقع (Favicon)</Label>
+                {form.favicon && (
+                  <div className="relative w-20 h-20 rounded-lg overflow-hidden border bg-gray-50 flex items-center justify-center">
+                    <img
+                      src={form.favicon}
+                      alt="Favicon"
+                      className="w-full h-full object-contain p-1"
+                    />
+                    <button
+                      onClick={() => setForm((f) => ({ ...f, favicon: '' }))}
+                      className="absolute -top-1 -right-1 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 transition-colors"
+                    >
+                      <X className="w-2.5 h-2.5" />
+                    </button>
+                  </div>
+                )}
+                <div>
+                  <input
+                    ref={faviconInputRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0]
+                      if (file) handleUploadFavicon(file)
+                    }}
+                  />
+                  <Button
+                    variant="outline"
+                    onClick={() => faviconInputRef.current?.click()}
+                    disabled={uploadingFavicon}
+                    className="w-full"
+                  >
+                    {uploadingFavicon ? (
+                      <Loader2 className="w-4 h-4 ml-2 animate-spin" />
+                    ) : (
+                      <Upload className="w-4 h-4 ml-2" />
+                    )}
+                    {uploadingFavicon ? 'جاري الرفع...' : 'رفع أيقونة'}
+                  </Button>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    يفضل PNG أو ICO (حجم موصى به: 32x32 بكسل)
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* معلومات الشركة */}
           <div className="space-y-4">
             <h3 className="text-base font-semibold text-[#0f172a] flex items-center gap-2">

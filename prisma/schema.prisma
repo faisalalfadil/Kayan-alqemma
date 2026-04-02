@@ -20,6 +20,8 @@ model SiteSettings {
   linkedin      String   @default("https://linkedin.com/company/kayan_alaqma")
   description   String   @default("شركة كيان القمة رائدة في توريد وتركيب المظلات الكهربائية")
   chatbotPrompt String   @default("")
+  logo          String   @default("")
+  favicon       String   @default("")
   updatedAt     DateTime @updatedAt
 }
 
