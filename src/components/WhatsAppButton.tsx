@@ -8,8 +8,8 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip'
 import { Button } from '@/components/ui/button'
+import { useSettings } from '@/hooks/useSettings'
 
-const WHATSAPP_NUMBER = '966501234567'
 const WHATSAPP_MESSAGE = 'مرحباً، أرغب في الاستفسار عن خدماتكم'
 const BADGE_KEY = 'whatsapp-badge-clicked'
 
@@ -27,6 +27,7 @@ function WhatsAppIcon({ className }: { className?: string }) {
 }
 
 export default function WhatsAppButton() {
+  const { settings } = useSettings()
   const [showBadge, setShowBadge] = useState(() => {
     if (typeof window !== 'undefined') {
       return !localStorage.getItem(BADGE_KEY)
@@ -37,7 +38,7 @@ export default function WhatsAppButton() {
   const handleClick = () => {
     localStorage.setItem(BADGE_KEY, 'true')
     setShowBadge(false)
-    const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(WHATSAPP_MESSAGE)}`
+    const url = `https://wa.me/${settings.whatsapp}?text=${encodeURIComponent(WHATSAPP_MESSAGE)}`
     window.open(url, '_blank', 'noopener,noreferrer')
   }
 

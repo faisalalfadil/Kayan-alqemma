@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Menu, Phone, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { useSettings } from '@/hooks/useSettings';
 import { Button } from '@/components/ui/button';
 import {
   Sheet,
@@ -30,18 +31,15 @@ const NAV_LINKS = [
   { label: 'اتصل بنا', href: '#contact' },
 ] as const;
 
-const PHONE_NUMBER = '+966 50 123 4567';
-const PHONE_HREF = 'tel:+966501234567';
-
 /* ------------------------------------------------------------------ */
 /*  Logo SVG (placeholder)                                             */
 /* ------------------------------------------------------------------ */
 
-function Logo({ className }: { className?: string }) {
+function Logo({ className, siteName }: { className?: string; siteName: string }) {
   return (
     <img
       src="/company-logo.png"
-      alt="شركة كيان القمة"
+      alt={siteName}
       className={cn('h-10 w-10 shrink-0 rounded-lg object-cover', className)}
     />
   );
@@ -51,23 +49,23 @@ function Logo({ className }: { className?: string }) {
 /*  Top Bar                                                            */
 /* ------------------------------------------------------------------ */
 
-function TopBar() {
+function TopBar({ phone, workingHours }: { phone: string; workingHours: string }) {
   return (
     <div className="bg-[#0f172a] text-white/80 text-xs">
       <div className="container mx-auto flex items-center justify-between px-4 py-2">
         {/* Phone */}
         <a
-          href={PHONE_HREF}
+          href={`tel:${phone.replace(/\s/g, '')}`}
           dir="ltr"
           className="flex items-center gap-1.5 transition-colors hover:text-white"
         >
           <Phone className="h-3.5 w-3.5" />
-          <span>{PHONE_NUMBER}</span>
+          <span>{phone}</span>
         </a>
 
         {/* Social & info */}
         <div className="flex items-center gap-4">
-          <span className="hidden sm:inline">السبت - الخميس: 8 صباحاً - 6 مساءً</span>
+          <span className="hidden sm:inline">{workingHours}</span>
           <span className="hidden md:inline text-white/30">|</span>
           {/* Social icons as simple text placeholders */}
           <div className="hidden sm:flex items-center gap-3">
@@ -136,9 +134,11 @@ function DesktopNav({
 function MobileNav({
   activeSection,
   onClose,
+  phone,
 }: {
   activeSection: string;
   onClose: () => void;
+  phone: string;
 }) {
   return (
     <div className="flex flex-col gap-1 px-4 pt-6">
@@ -189,12 +189,12 @@ function MobileNav({
 
         {/* Mobile phone */}
         <a
-          href={PHONE_HREF}
+          href={`tel:${phone.replace(/\s/g, '')}`}
           dir="ltr"
           className="mt-4 flex items-center justify-center gap-2 rounded-lg border border-border px-4 py-3 text-sm text-muted-foreground transition-colors hover:border-brand-blue hover:text-brand-blue"
         >
           <Phone className="h-4 w-4" />
-          {PHONE_NUMBER}
+          {phone}
         </a>
       </motion.div>
     </div>
@@ -206,6 +206,7 @@ function MobileNav({
 /* ------------------------------------------------------------------ */
 
 export default function Header() {
+  const { settings } = useSettings();
   const [isScrolled, setIsScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState('home');
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -290,7 +291,7 @@ export default function Header() {
             transition={{ duration: 0.3 }}
             className="overflow-hidden"
           >
-            <TopBar />
+            <TopBar phone={settings.phone} workingHours={settings.workingHours} />
           </motion.div>
         )}
       </AnimatePresence>
@@ -305,11 +306,11 @@ export default function Header() {
               whileTap={{ scale: 0.97 }}
               transition={{ type: 'spring', stiffness: 400, damping: 17 }}
             >
-              <Logo className="text-white" />
+              <Logo className="text-white" siteName={settings.siteName} />
             </motion.div>
             <div className="flex flex-col leading-tight">
               <span className="text-white font-bold text-sm sm:text-base lg:text-lg tracking-tight">
-                شركة كيان القمة
+                {settings.siteName}
               </span>
               <span className="text-white/50 text-[10px] sm:text-xs hidden sm:block">
                 توريد وتركيب المظلات الكهربائية
@@ -355,14 +356,14 @@ export default function Header() {
               >
                 {/* Mobile header */}
                 <div className="flex items-center gap-3 border-b px-4 py-4">
-                  <Logo className="text-brand-blue" />
+                  <Logo className="text-brand-blue" siteName={settings.siteName} />
                   <SheetTitle className="text-base font-bold text-foreground">
-                    شركة كيان القمة
+                    {settings.siteName}
                   </SheetTitle>
                 </div>
 
                 {/* Nav links */}
-                <MobileNav activeSection={activeSection} onClose={closeMobile} />
+                <MobileNav activeSection={activeSection} onClose={closeMobile} phone={settings.phone} />
               </SheetContent>
             </Sheet>
           </div>

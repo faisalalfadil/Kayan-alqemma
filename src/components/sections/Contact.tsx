@@ -20,6 +20,7 @@ import {
   MessageSquare,
   Loader2,
 } from 'lucide-react'
+import { useSettings } from '@/hooks/useSettings'
 
 const contactSchema = z.object({
   name: z.string().min(3, 'يجب أن يحتوي الاسم على 3 أحرف على الأقل'),
@@ -34,33 +35,34 @@ const contactSchema = z.object({
 
 type ContactFormData = z.infer<typeof contactSchema>
 
-const contactInfo = [
-  {
-    icon: MapPin,
-    label: 'العنوان',
-    value: 'طريق الملك فهد، حي العليا، الرياض',
-  },
-  {
-    icon: Phone,
-    label: 'الهاتف',
-    value: '+966 50 123 4567',
-    href: 'tel:+966501234567',
-  },
-  {
-    icon: Mail,
-    label: 'البريد الإلكتروني',
-    value: 'info@kayan-alaqma.sa',
-    href: 'mailto:info@kayan-alaqma.sa',
-  },
-  {
-    icon: Clock,
-    label: 'ساعات العمل',
-    value: 'السبت - الخميس: 8 صباحًا - 6 مساءً',
-  },
-]
-
 export default function Contact() {
+  const { settings } = useSettings()
   const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const contactInfo = [
+    {
+      icon: MapPin,
+      label: 'العنوان',
+      value: settings.address,
+    },
+    {
+      icon: Phone,
+      label: 'الهاتف',
+      value: settings.phone,
+      href: `tel:${settings.phone.replace(/\s/g, '')}`,
+    },
+    {
+      icon: Mail,
+      label: 'البريد الإلكتروني',
+      value: settings.email,
+      href: `mailto:${settings.email}`,
+    },
+    {
+      icon: Clock,
+      label: 'ساعات العمل',
+      value: settings.workingHours,
+    },
+  ]
   const { toast } = useToast()
 
   const {
@@ -341,7 +343,7 @@ export default function Contact() {
                       موقعنا على الخريطة
                     </p>
                     <p className="text-brand-gray text-sm mt-1">
-                      طريق الملك فهد، حي العليا، الرياض
+                      {settings.address}
                     </p>
                   </div>
                   <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-l from-brand-blue via-brand-orange to-brand-blue" />

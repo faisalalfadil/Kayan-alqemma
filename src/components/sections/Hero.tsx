@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { ChevronDown, Phone, ArrowLeft, Shield, Award, Users } from 'lucide-react';
+import { useSettings } from '@/hooks/useSettings';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -32,6 +33,7 @@ const statsData = [
 ];
 
 export default function Hero() {
+  const { settings } = useSettings();
   const scrollToSection = (id: string) => {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -95,10 +97,13 @@ export default function Hero() {
         >
           {/* Badge */}
           <motion.div variants={fadeInUp} className="mb-6">
-            <span className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm text-white/90 text-sm font-medium px-4 py-2 rounded-full border border-white/10">
+            <a
+              href={`tel:${settings.phone.replace(/\s/g, '')}`}
+              className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm text-white/90 text-sm font-medium px-4 py-2 rounded-full border border-white/10 hover:bg-white/15 transition-colors"
+            >
               <Phone className="w-4 h-4" />
-              <span>اتصل بنا الآن: 966501234567+</span>
-            </span>
+              <span>اتصل بنا الآن: {settings.phone.replace(/\s/g, '')}</span>
+            </a>
           </motion.div>
 
           {/* Main Heading */}

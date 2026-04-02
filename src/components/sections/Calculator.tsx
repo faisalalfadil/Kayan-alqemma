@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import { useSettings } from '@/hooks/useSettings';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -755,6 +756,7 @@ function Step4({
   formData: FormData;
   onReset: () => void;
 }) {
+  const { settings } = useSettings();
   const breakdown = useMemo(() => calculatePrice(formData), [formData]);
   const service = getSelectedService(formData.serviceType);
   const fabric = getSelectedFabric(formData.fabric);
@@ -784,7 +786,7 @@ function Step4({
 
   const handleWhatsApp = () => {
     window.open(
-      `https://wa.me/966501234567?text=${whatsappMessage}`,
+      `https://wa.me/${settings.whatsapp}?text=${whatsappMessage}`,
       '_blank'
     );
   };

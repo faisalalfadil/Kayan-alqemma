@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useMemo } from 'react'
+import { useSettings } from '@/hooks/useSettings'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Calendar, CheckCircle2, Clock, MapPin, Phone, Shield, Loader2, RotateCcw } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
@@ -55,6 +56,7 @@ interface FormData {
 }
 
 export default function Booking() {
+  const { settings } = useSettings()
   const [form, setForm] = useState<FormData>({
     name: '',
     phone: '',
@@ -432,7 +434,7 @@ export default function Booking() {
                     <Phone className="size-5 text-[#ea580c]" />
                     <div>
                       <p className="text-xs text-slate-400">أو اتصل بنا مباشرة</p>
-                      <p className="font-bold text-slate-800" dir="ltr">+966 50 123 4567</p>
+                      <p className="font-bold text-slate-800" dir="ltr">{settings.phone}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 text-slate-600">

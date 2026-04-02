@@ -758,6 +758,9 @@ export default function AdminDashboard({ onClose }: AdminDashboardProps) {
       if (data.success) {
         showToast('تم حفظ الإعدادات بنجاح')
         setSettings(settingsForm as SiteSettings)
+        // Update global settings store so all components reflect changes immediately
+        const { useSettingsStore } = await import('@/hooks/useSettings')
+        useSettingsStore.getState().updateSettings(settingsForm as SiteSettings)
       } else {
         showToast(data.error || 'حدث خطأ', 'error')
       }

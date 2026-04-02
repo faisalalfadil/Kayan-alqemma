@@ -126,3 +126,39 @@ Stage Summary:
 - Model produces high-quality Arabic responses following the company persona
 - Response time ~2-6 seconds depending on query complexity
 - Graceful fallback to predefined Arabic responses if model fails
+
+---
+Task ID: 5
+Agent: Main Agent
+Task: Fix settings not updating across the website after admin changes
+
+Work Log:
+- Diagnosed root cause: `useSettings` hook loaded data only once (`if (get().settings) return`) and never updated
+- Found all components used hardcoded phone/email/whatsapp values instead of dynamic settings
+- Found AdminDashboard saved to API but didn't notify the global settings store
+
+Fixes applied:
+1. **useSettings hook** (`src/hooks/useSettings.ts`):
+   - Added `force` parameter to `fetchSettings` to allow re-fetching
+   - Added `updateSettings` method to update store directly
+   - Added `refetch()` convenience method that forces re-fetch
+
+2. **AdminDashboard** (`src/components/admin/AdminDashboard.tsx`):
+   - After saving settings, now calls `useSettingsStore.getState().updateSettings()` to update global store
+   - All components instantly reflect changes without page refresh
+
+3. **Components updated to use dynamic settings** (8 files total):
+   - Header.tsx: phone, siteName, workingHours → useSettings
+   - Hero.tsx: phone badge → useSettings
+   - Footer.tsx: phone, email, whatsapp, address, workingHours, social media → useSettings
+   - Contact.tsx: contactInfo array → useSettings (moved inside component)
+   - WhatsAppButton.tsx: whatsapp number → useSettings
+   - Calculator.tsx: whatsapp URL → useSettings
+   - Booking.tsx: phone display → useSettings
+   - Services.tsx: whatsapp URL in detail dialog → useSettings
+
+Stage Summary:
+- Changing phone/email/whatsapp from admin dashboard now updates ALL components immediately
+- No page refresh required - Zustand store propagates changes in real-time
+- ESLint passes with no errors
+- Settings API PUT verified working correctly

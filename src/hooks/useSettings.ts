@@ -19,7 +19,8 @@ interface SiteSettings {
 interface SettingsStore {
   settings: SiteSettings | null
   loading: boolean
-  fetchSettings: () => Promise<void>
+  fetchSettings: (force?: boolean) => Promise<void>
+  updateSettings: (data: Partial<SiteSettings>) => void
 }
 
 const DEFAULT_SETTINGS: SiteSettings = {
@@ -37,11 +38,14 @@ const DEFAULT_SETTINGS: SiteSettings = {
   chatbotPrompt: '',
 }
 
-export const useSettingsStore = create<SettingsStore>((set, get) => ({
+export const useSettingsStore = create<SettingsStore>((set) => ({
   settings: null,
   loading: false,
-  fetchSettings: async () => {
-    if (get().settings) return
+  fetchSettings: async (force = false) => {
+    if (!force) {
+      const existing = useSettingsStore.getState().settings
+      if (existing) return
+    }
     set({ loading: true })
     try {
       const res = await fetch('/api/settings')
@@ -54,6 +58,10 @@ export const useSettingsStore = create<SettingsStore>((set, get) => ({
     } catch {
       set({ settings: DEFAULT_SETTINGS, loading: false })
     }
+  },
+  updateSettings: (data: Partial<SiteSettings>) => {
+    const current = useSettingsStore.getState().settings || DEFAULT_SETTINGS
+    set({ settings: { ...current, ...data } })
   },
 }))
 
@@ -72,7 +80,8 @@ export function useSettings() {
   return {
     settings: settings || DEFAULT_SETTINGS,
     loading,
-    refetch: fetchSettings,
+    refetch: () => fetchSettings(true),
+    updateSettings: useSettingsStore((s) => s.updateSettings),
     phone: (settings || DEFAULT_SETTINGS).phone,
     whatsapp: (settings || DEFAULT_SETTINGS).whatsapp,
     email: (settings || DEFAULT_SETTINGS).email,

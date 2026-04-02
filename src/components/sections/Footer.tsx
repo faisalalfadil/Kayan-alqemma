@@ -17,6 +17,7 @@ import {
   Settings,
 } from 'lucide-react'
 import { useAdminStore } from '@/store/admin-store'
+import { useSettings } from '@/hooks/useSettings'
 
 const quickLinks = [
   { label: 'الرئيسية', href: '#home' },
@@ -41,6 +42,7 @@ export default function Footer() {
   const [isSubscribing, setIsSubscribing] = useState(false)
   const [subscribeMessage, setSubscribeMessage] = useState('')
   const openAdmin = useAdminStore((s) => s.open)
+  const { settings } = useSettings()
 
   const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -89,11 +91,11 @@ export default function Footer() {
             <div className="flex items-center gap-3">
               <img
                 src="/company-logo.png"
-                alt="شركة كيان القمة"
+                alt={settings.siteName}
                 className="w-12 h-12 rounded-xl object-cover"
               />
               <div>
-                <h3 className="font-bold text-lg text-white">كيان القمة</h3>
+                <h3 className="font-bold text-lg text-white">{settings.siteName}</h3>
                 <p className="text-xs text-slate-400">للمظلات الكهربائية</p>
               </div>
             </div>
@@ -107,7 +109,7 @@ export default function Footer() {
             {/* Social Media Links */}
             <div className="flex items-center gap-3">
               <a
-                href="https://twitter.com/kayan_alaqma"
+                href={settings.twitter}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-10 h-10 rounded-lg bg-white/10 hover:bg-brand-orange flex items-center justify-center transition-all duration-300 hover:scale-110"
@@ -118,7 +120,7 @@ export default function Footer() {
                 </svg>
               </a>
               <a
-                href="https://instagram.com/kayan_alaqma"
+                href={settings.instagram}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-10 h-10 rounded-lg bg-white/10 hover:bg-brand-orange flex items-center justify-center transition-all duration-300 hover:scale-110"
@@ -127,7 +129,7 @@ export default function Footer() {
                 <Instagram className="w-5 h-5" />
               </a>
               <a
-                href="https://linkedin.com/company/kayan-alaqma"
+                href={settings.linkedin}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-10 h-10 rounded-lg bg-white/10 hover:bg-brand-orange flex items-center justify-center transition-all duration-300 hover:scale-110"
@@ -136,7 +138,7 @@ export default function Footer() {
                 <Linkedin className="w-5 h-5" />
               </a>
               <a
-                href="https://wa.me/966501234567"
+                href={`https://wa.me/${settings.whatsapp}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-10 h-10 rounded-lg bg-white/10 hover:bg-green-500 flex items-center justify-center transition-all duration-300 hover:scale-110"
@@ -222,11 +224,11 @@ export default function Footer() {
                 <div>
                   <p className="text-xs text-slate-500 mb-0.5">الهاتف</p>
                   <a
-                    href="tel:+966501234567"
+                    href={`tel:${settings.phone.replace(/\s/g, '')}`}
                     className="text-sm text-slate-300 hover:text-brand-orange transition-colors"
                     dir="ltr"
                   >
-                    +966 50 123 4567
+                    {settings.phone}
                   </a>
                 </div>
               </div>
@@ -236,10 +238,10 @@ export default function Footer() {
                 <div>
                   <p className="text-xs text-slate-500 mb-0.5">البريد الإلكتروني</p>
                   <a
-                    href="mailto:info@kayan-alaqma.sa"
+                    href={`mailto:${settings.email}`}
                     className="text-sm text-slate-300 hover:text-brand-orange transition-colors"
                   >
-                    info@kayan-alaqma.sa
+                    {settings.email}
                   </a>
                 </div>
               </div>
@@ -249,7 +251,7 @@ export default function Footer() {
                 <div>
                   <p className="text-xs text-slate-500 mb-0.5">العنوان</p>
                   <p className="text-sm text-slate-300">
-                    طريق الملك فهد، حي العليا، الرياض
+                    {settings.address}
                   </p>
                 </div>
               </div>
@@ -259,7 +261,7 @@ export default function Footer() {
                 <div>
                   <p className="text-xs text-slate-500 mb-0.5">ساعات العمل</p>
                   <p className="text-sm text-slate-300">
-                    السبت - الخميس: 8 صباحًا - 6 مساءً
+                    {settings.workingHours}
                   </p>
                 </div>
               </div>
@@ -315,7 +317,7 @@ export default function Footer() {
         <div className="container mx-auto px-4 py-5">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <p className="text-slate-500 text-sm text-center sm:text-right">
-              © 2025 شركة كيان القمة. جميع الحقوق محفوظة.
+              © 2025 {settings.siteName}. جميع الحقوق محفوظة.
             </p>
             <div className="flex items-center gap-4">
               <a

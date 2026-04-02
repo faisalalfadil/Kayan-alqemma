@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useSettings } from '@/hooks/useSettings';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -560,6 +561,7 @@ function ServiceDetailDialog({
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
+  const { settings } = useSettings();
   const Icon = service.icon;
 
   const scrollToSection = (id: string) => {
@@ -777,7 +779,7 @@ function ServiceDetailDialog({
                 className="border-2 border-white/40 bg-white/10 hover:bg-white/20 text-white font-bold px-8 py-6 rounded-xl backdrop-blur-sm transition-all duration-300"
                 onClick={() => {
                   window.open(
-                    'https://wa.me/966501234567',
+                    `https://wa.me/${settings.whatsapp}`,
                     '_blank'
                   );
                 }}
