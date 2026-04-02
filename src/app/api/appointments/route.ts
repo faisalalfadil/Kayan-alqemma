@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
 
     const result = appointmentSchema.safeParse(body)
     if (!result.success) {
-      const firstError = result.error.errors[0]
+      const firstError = result.error.issues[0]
       return NextResponse.json(
         { success: false, message: firstError?.message || 'بيانات غير صالحة' },
         { status: 400 }

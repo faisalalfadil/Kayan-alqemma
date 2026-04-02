@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
 
     if (!validated.success) {
       return NextResponse.json(
-        { success: false, error: validated.error.errors[0]?.message || 'بيانات غير صالحة' },
+        { success: false, error: validated.error.issues[0]?.message || 'بيانات غير صالحة' },
         { status: 400 }
       )
     }

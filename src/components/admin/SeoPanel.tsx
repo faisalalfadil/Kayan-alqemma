@@ -287,7 +287,7 @@ export default function SeoPanel({ showToast }: SeoPanelProps) {
     const hasTitle = homeSeo && homeSeo.title && homeSeo.title.length > 0
     const titleLength = homeSeo?.title?.length || 0
     const titleGood = titleLength >= 30 && titleLength <= 60
-    checks.push({ label: 'عنوان الموقع', passed: hasTitle && titleGood, weight: 10 })
+    checks.push({ label: 'عنوان الموقع', passed: !!(hasTitle && titleGood), weight: 10 })
     if (hasTitle && titleGood) score += 10
     else if (hasTitle) score += 5
 
@@ -295,7 +295,7 @@ export default function SeoPanel({ showToast }: SeoPanelProps) {
     const hasDesc = homeSeo && homeSeo.description && homeSeo.description.length > 0
     const descLength = homeSeo?.description?.length || 0
     const descGood = descLength >= 120 && descLength <= 160
-    checks.push({ label: 'وصف الموقع', passed: hasDesc && descGood, weight: 10 })
+    checks.push({ label: 'وصف الموقع', passed: !!(hasDesc && descGood), weight: 10 })
     if (hasDesc && descGood) score += 10
     else if (hasDesc) score += 5
 

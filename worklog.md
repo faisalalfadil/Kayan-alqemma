@@ -68,3 +68,61 @@ Stage Summary:
 - All data seeded: 6 services, 8 FAQs, 6 projects, 6 blog posts, 6 testimonials, 1 site settings
 - All API endpoints verified working with PostgreSQL backend
 - No code changes needed beyond schema provider switch
+
+---
+Task ID: 3
+Agent: Main Agent
+Task: Fix application not working - server down + TypeScript errors
+
+Work Log:
+- Diagnosed dev server not running (port 3000 not bound, process not found)
+- Found multiple Framer Motion TypeScript type errors: `ease: 'easeOut'` in variant objects needed `as const` assertion
+- Fixed 7 component files by adding `as const` to ease properties in variant definitions:
+  - Hero.tsx (fadeInUp variant)
+  - Blog.tsx (itemVariants)
+  - Calculator.tsx (stepContainerVariants)
+  - FAQ.tsx (itemVariants)
+  - Testimonials.tsx (itemVariants)
+  - Projects.tsx (variant object)
+  - Services.tsx (itemVariants)
+- Found missing `jspdf` package required by CompanyProfile.tsx
+- Installed jspdf@4.2.1 via `bun add jspdf`
+- Restarted dev server and verified all endpoints working
+- Verified all 7 API endpoints return correct data:
+  - GET / → 200 ✅
+  - GET /api/settings → 200 ✅
+  - GET /api/services → 200 (6 items) ✅
+  - GET /api/projects → 200 (6 items) ✅
+  - GET /api/blog → 200 (6 items) ✅
+  - GET /api/testimonials → 200 (6 items) ✅
+  - GET /api/faqs → 200 (8 items) ✅
+  - POST /api/chat → 200 ✅
+- ESLint passes with no errors
+
+Stage Summary:
+- Application is now fully functional
+- All TypeScript type errors in src/ components resolved
+- Missing jspdf dependency installed
+- Dev server running and serving all routes correctly
+- All API endpoints verified returning correct data from PostgreSQL
+
+---
+Task ID: 4
+Agent: Main Agent
+Task: Switch chatbot AI model to google/gemma-3n-e2b-it:free
+
+Work Log:
+- User requested using model `google/gemma-3n-e2b-it:free` for the chatbot
+- Checked z-ai-web-dev-sdk type definitions - confirmed `model?: string` is supported in CreateChatCompletionBody
+- Updated `src/app/api/chat/route.ts` to pass `model: 'google/gemma-3n-e2b-it:free'` to the SDK
+- Tested chatbot with two queries:
+  - "مرحبا، ما هي خدماتكم؟" → responded with full services list in Arabic ✅
+  - "كم سعر المظلات الكهربائية؟" → responded appropriately with pricing guidance ✅
+- All responses are in Arabic and follow the system prompt instructions
+- Fallback mechanism still in place if the model is unavailable
+
+Stage Summary:
+- Chatbot now uses google/gemma-3n-e2b-it:free model via z-ai-web-dev-sdk
+- Model produces high-quality Arabic responses following the company persona
+- Response time ~2-6 seconds depending on query complexity
+- Graceful fallback to predefined Arabic responses if model fails

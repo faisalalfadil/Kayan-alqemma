@@ -29,7 +29,7 @@ export async function PUT(
     const result = updateSchema.safeParse(body)
     if (!result.success) {
       return NextResponse.json(
-        { success: false, message: result.error.errors[0]?.message || 'بيانات غير صالحة' },
+        { success: false, message: result.error.issues[0]?.message || 'بيانات غير صالحة' },
         { status: 400 }
       )
     }

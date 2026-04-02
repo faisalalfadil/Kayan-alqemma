@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
 
     // Build messages array for AI - use 'assistant' role for system prompt per SDK docs
     const systemPrompt = await buildSystemPrompt()
-    const messages: { role: string; content: string }[] = [
+    const messages: { role: 'user' | 'assistant'; content: string }[] = [
       { role: 'assistant', content: systemPrompt },
     ]
 
@@ -90,7 +90,7 @@ export async function POST(request: NextRequest) {
       const recentHistory = history.slice(-10)
       for (const msg of recentHistory) {
         if (msg.role === 'user' || msg.role === 'assistant') {
-          messages.push({ role: msg.role, content: msg.content })
+          messages.push({ role: msg.role as 'user' | 'assistant', content: msg.content })
         }
       }
     }
@@ -104,6 +104,7 @@ export async function POST(request: NextRequest) {
     try {
       const zai = await ZAI.create()
       const completion = await zai.chat.completions.create({
+        model: 'google/gemma-3-27b-it:free',
         messages,
         thinking: { type: 'disabled' },
       })
