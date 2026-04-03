@@ -1,40 +1,125 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-model Admin {
-  id               String   @id @default(cuid())
-  username         String   @unique
-  password         String
-  securityQuestion String?
-  securityAnswer   String?
-  phone1           String?
-  phone2           String?
-  sessionToken     String?
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
-
-  articles Article[]
+model SiteSettings {
+  id            String   @id @default(cuid())
+  siteName      String   @default("شركة كيان القمة")
+  phone         String   @default("+966 50 123 4567")
+  email         String   @default("info@kayan-alaqma.sa")
+  address       String   @default("طريق الملك فهد، حي العليا، الرياض")
+  workingHours  String   @default("السبت - الخميس: 8 صباحًا - 6 مساءً")
+  whatsapp      String   @default("966501234567")
+  twitter       String   @default("https://twitter.com/kayan_alaqma")
+  instagram     String   @default("https://instagram.com/kayan_alaqma")
+  linkedin      String   @default("https://linkedin.com/company/kayan_alaqma")
+  description   String   @default("شركة كيان القمة رائدة في توريد وتركيب المظلات الكهربائية")
+  chatbotPrompt String   @default("")
+  updatedAt     DateTime @updatedAt
 }
 
-model Article {
-  id        String   @id @default(cuid())
-  title     String
-  slug      String   @unique
-  content   String   @default("")
-  excerpt   String   @default("")
-  published Boolean  @default(false)
-  authorId  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model BlogPost {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  excerpt     String?
+  content     String
+  coverImage  String?
+  metaDescription String?
+  published   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
 
-  author Admin @relation(fields: [authorId], references: [id])
+model Project {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  image       String?
+  category    String?
+  clientName  String?
+  location    String?
+  completedAt DateTime?
+  featured    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+}
+
+model Service {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  icon        String?
+  features    String?
+  order       Int      @default(0)
+}
+
+model FAQ {
+  id          String   @id @default(cuid())
+  question    String
+  answer      String
+  category    String?
+  order       Int      @default(0)
+}
+
+model ContactMessage {
+  id          String   @id @default(cuid())
+  name        String
+  email       String
+  phone       String?
+  subject     String?
+  message     String
+  read        Boolean  @default(false)
+  createdAt   DateTime @default(now())
+}
+
+model Testimonial {
+  id          String   @id @default(cuid())
+  name        String
+  role        String?
+  content     String
+  rating      Int
+  avatar      String?
+}
+
+model Newsletter {
+  id          String   @id @default(cuid())
+  email       String   @unique
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+}
+
+model Appointment {
+  id          String   @id @default(cuid())
+  name        String
+  phone       String
+  email       String?
+  serviceType String
+  date        String
+  time        String
+  notes       String?
+  status      String   @default("pending")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model SeoSetting {
+  id          String   @id @default(cuid())
+  page        String   @unique
+  title       String
+  description String
+  keywords    String?
+  ogTitle     String?
+  ogDescription String?
+  ogImage     String?
+  canonicalUrl String?
+  robots      String   @default("index, follow")
+  schema      String?
+  focusKeyword String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
