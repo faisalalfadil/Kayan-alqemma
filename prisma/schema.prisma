@@ -8,19 +8,26 @@ datasource db {
 }
 
 model SiteSettings {
-  id            String   @id @default(cuid())
+  id            Int      @id @default(autoincrement())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
   siteName      String   @default("شركة كيان القمة")
-  phone         String   @default("+966 50 123 4567")
+  phone         String   @default("+966 530521369")
   email         String   @default("info@kayan-alaqma.sa")
   address       String   @default("طريق الملك فهد، حي العليا، الرياض")
   workingHours  String   @default("السبت - الخميس: 8 صباحًا - 6 مساءً")
-  whatsapp      String   @default("966501234567")
+  whatsapp      String   @default("966530521369")
   twitter       String   @default("https://twitter.com/kayan_alaqma")
   instagram     String   @default("https://instagram.com/kayan_alaqma")
   linkedin      String   @default("https://linkedin.com/company/kayan_alaqma")
   description   String   @default("شركة كيان القمة رائدة في توريد وتركيب المظلات الكهربائية")
   chatbotPrompt String   @default("")
-  updatedAt     DateTime @updatedAt
+}
+model siteSettings {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  // أضف الحقول الأخرى هنا
 }
 
 model BlogPost {

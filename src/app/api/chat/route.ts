@@ -1,25 +1,43 @@
 import { NextRequest, NextResponse } from 'next/server'
-import ZAI from 'z-ai-web-dev-sdk'
 import { db } from '@/lib/db'
 
 // Simple fallback responses for when AI is unavailable
 const FALLBACK_RESPONSES: Record<string, string> = {
-  services: 'نقدم في شركة كيان القمة مجموعة واسعة من الخدمات:\n\n1. 🏗️ المظلات الكهربائية - مظلات قابلة للفتح والإغلاق كهربائياً\n2. 🚗 مظلات السيارات - حماية سياراتك من الشمس والأمطار\n3. 🌳 مظلات الحدائق - تصميمات أنيقة لمساحاتك الخارجية\n4. 🏊 مظلات المسابح - حماية متخصصة للمسابح\n5. 🛋️ كنب الحديقة - أثاث خارجي عالي الجودة\n6. 🔧 الصيانة - خدمات صيانة دورية وطوارئ\n\nللحصول على عرض سعر مخصص، تواصل معنا عبر الهاتف أو الواتساب.',
-  prices: 'أسعارنا تعتمد على عدة عوامل:\n\n• نوع الخدمة المطلوبة\n• المساحة المراد تغطيتها\n• نوع القماش والمواد\n• الإضافات الاختيارية (محرك، إضاءة LED، مستشعر مطر)\n\nننصحك باستخدام حاسبة الأسعار على موقعنا للحصول على تقدير سريع، أو تواصل معنا للحصول على عرض سعر مخصص ودقيق.\n\n📞 الهاتف: +966 50 123 4567',
-  booking: 'لحجز موعد استشارة مجانية:\n\n📞 اتصل بنا: +966 50 123 4567\n📧 البريد: info@kayan-alaqma.sa\n📱 أو استخدم نموذج حجز الموعد على الموقع\n\nساعات العمل: السبت - الخميس، 8 صباحاً - 6 مساءً\n\nنقدم زيارة ميدانية مجانية لفحص الموقع وتقديم أفضل الحلول!',
-  warranty: 'نقدم ضمان شامل على جميع منتجاتنا وخدماتنا:\n\n• ✅ ضمان 5 سنوات على الهيكل\n• ✅ ضمان 3 سنوات على المحرك\n• ✅ ضمان سنتين على القماش\n• ✅ خدمة صيانة دورية\n• ✅ خدمة طوارئ على مدار الساعة\n\nراحتك ورضاك هو أولويتنا!',
-  contact: 'تواصل معنا عبر:\n\n📞 الهاتف: +966 50 123 4567\n📧 البريد: info@kayan-alaqma.sa\n📍 العنوان: طريق الملك فهد، حي العليا، الرياض\n🕐 ساعات العمل: السبت - الخميس 8 صباحاً - 6 مساءً\n\nيمكنك أيضاً إرسال رسالة عبر نموذج الاتصال على الموقع أو التواصل عبر الواتساب.',
-  default: 'مرحباً بك في شركة كيان القمة! 😊\n\nنحن متخصصون في توريد وتركيب المظلات الكهربائية في المملكة العربية السعودية بخبرة تتجاوز 15 عاماً.\n\nكيف يمكنني مساعدتك اليوم؟ يمكنك الاستفسار عن:\n• خدماتنا المتنوعة\n• الأسعار والعروض\n• حجز موعد استشارة\n• معلومات الضمان\n\nأو تواصل معنا مباشرة:\n📞 +966 50 123 4567',
+  services: 'نقدم في شركة كيان القمة مجموعة واسعة من الخدمات:\n\n🏗️ **المظلات الكهربائية (البرجولات)**\nمظلات قابلة للفتح والإغلاق كهربائياً بأنظمة تحكم متطورة\n\n🚗 **مظلات السيارات**\nحماية سياراتك من الشمس والأمطار بتصاميم عصرية\n\n🌳 **مظلات الحدائق**\nتغطية مساحات خارجية للحدائق والمناطق الترفيهية\n\n🏊 **أغطية المسابح**\nحماية المسابح من الأتربة والشمس مع سهولة الفتح والإغلاق\n\n🛋️ **الأثاث الخارجي**\nتأثيث المساحات الخارجية بمواد عالية الجودة\n\n🔧 **الصيانة**\nخدمات صيانة دورية وطوارئ لجميع أنواع المظلات\n\nللحصول على عرض سعر مخصص، تواصل معنا:\n📞 +966 50 123 4567',
+  prices: 'أسعارنا تعتمد على عدة عوامل:\n\n💰 **العوامل المؤثرة في السعر:**\n• نوع الخدمة المطلوبة\n• المساحة المراد تغطيتها\n• نوع القماش والمواد المستخدمة\n• الإضافات الاختيارية (محرك كهربائي، إضاءة LED، مستشعر مطر)\n• موقع التركيب\n\n✨ **للحصول على عرض سعر دقيق:**\nننصحك باستخدام حاسبة الأسعار على موقعنا للحصول على تقدير سريع، أو تواصل معنا مباشرة للحصول على عرض سعر مخصص ودقيق.\n\n📞 الهاتف: +966 50 123 4567\n📧 البريد: info@kayan-alaqma.sa',
+  booking: '📅 **لحجز موعد استشارة مجانية:**\n\n📞 **اتصل بنا:** +966 50 123 4567\n📧 **البريد:** info@kayan-alaqma.sa\n📱 **أو استخدم نموذج حجز الموعد على الموقع**\n\n🕐 **ساعات العمل:**\nالسبت - الخميس، 8 صباحاً - 6 مساءً\n\n✅ **نقدم:**\n• زيارة ميدانية مجانية\n• فحص الموقع وتقييم احتياجاتك\n• تقديم أفضل الحلول المناسبة\n• عرض سعر تفصيلي',
+  warranty: '✅ **ضمان شامل على جميع منتجاتنا:**\n\n🔹 ضمان 5 سنوات على الهيكل المعدني\n🔹 ضمان 3 سنوات على المحرك الكهربائي\n🔹 ضمان سنتين على القماش والأقمشة\n🔹 خدمة صيانة دورية مجانية للسنة الأولى\n🔹 خدمة طوارئ على مدار الساعة\n\n💯 **التزامنا:**\nراحتك ورضاك هو أولويتنا! نستخدم أفضل المواد ونقدم خدمة ما بعد البيع المتميزة.\n\n📞 للاستفسار: +966 50 123 4567',
+  contact: '📞 **تواصل معنا:**\n\n☎️ **الهاتف:** +966 50 123 4567\n📧 **البريد:** info@kayan-alaqma.sa\n📍 **العنوان:** طريق الملك فهد، حي العليا، الرياض\n🕐 **ساعات العمل:** السبت - الخميس 8 صباحاً - 6 مساءً\n\n💬 **طرق التواصل:**\n• إرسال رسالة عبر نموذج الاتصال على الموقع\n• التواصل عبر الواتساب\n• زيارة مقرنا الرئيسي\n\nنحن في خدمتك دائماً! 😊',
+  default: 'مرحباً بك في شركة كيان القمة! 😊\n\nنحن متخصصون في توريد وتركيب المظلات الكهربائية في المملكة العربية السعودية بخبرة تتجاوز 15 عاماً.\n\n**كيف يمكنني مساعدتك اليوم؟**\n\nيمكنك الاستفسار عن:\n• 🏗️ خدماتنا المتنوعة\n• 💰 الأسعار والعروض\n• 📅 حجز موعد استشارة مجانية\n• ✅ معلومات الضمان\n• 📞 طرق التواصل\n\n**أو تواصل معنا مباشرة:**\n📞 +966 50 123 4567\n📧 info@kayan-alaqma.sa',
 }
 
 function getFallbackResponse(message: string): string {
-  const lowerMsg = message.toLowerCase()
+  const msg = message.trim()
 
-  if (lowerMsg.includes('خدم') || lowerMsg.includes('خدمات')) return FALLBACK_RESPONSES.services
-  if (lowerMsg.includes('سعر') || lowerMsg.includes('تكلف') || lowerMsg.includes('ثمن')) return FALLBACK_RESPONSES.prices
-  if (lowerMsg.includes('حجز') || lowerMsg.includes('موعد') || lowerMsg.includes('استشار')) return FALLBACK_RESPONSES.booking
-  if (lowerMsg.includes('ضمان') || lowerMsg.includes('صيان')) return FALLBACK_RESPONSES.warranty
-  if (lowerMsg.includes('تواصل') || lowerMsg.includes('اتصل') || lowerMsg.includes('هاتف') || lowerMsg.includes('رقم')) return FALLBACK_RESPONSES.contact
+  // Price keywords (check first as it's more specific)
+  if (/سعر|أسعار|تكلف|ثمن|تكاليف|قيمة/.test(msg)) {
+    return FALLBACK_RESPONSES.prices
+  }
+
+  // Services keywords
+  if (/خدم|خدمات|تقدم|تقدمون|منتج|عروض|مظلات|برجول/.test(msg)) {
+    return FALLBACK_RESPONSES.services
+  }
+
+  // Booking keywords
+  if (/حجز|موعد|استشار|زيارة|أحجز/.test(msg)) {
+    return FALLBACK_RESPONSES.booking
+  }
+
+  // Warranty keywords
+  if (/ضمان|صيان|كفال|جودة/.test(msg)) {
+    return FALLBACK_RESPONSES.warranty
+  }
+
+  // Contact keywords
+  if (/تواصل|اتصل|هاتف|رقم|عنوان|موقع|بريد|واتس/.test(msg)) {
+    return FALLBACK_RESPONSES.contact
+  }
 
   return FALLBACK_RESPONSES.default
 }
@@ -78,10 +96,10 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Build messages array for AI - use 'assistant' role for system prompt per SDK docs
+    // Build messages array for AI
     const systemPrompt = await buildSystemPrompt()
-    const messages: { role: 'user' | 'assistant'; content: string }[] = [
-      { role: 'assistant', content: systemPrompt },
+    const messages: { role: 'system' | 'user' | 'assistant'; content: string }[] = [
+      { role: 'system', content: systemPrompt },
     ]
 
     // Add conversation history if provided
@@ -102,18 +120,10 @@ export async function POST(request: NextRequest) {
     let reply: string | undefined
 
     try {
-      const zai = await ZAI.create()
-      const completion = await zai.chat.completions.create({
-        model: 'google/gemma-3-27b-it:free',
-        messages,
-        thinking: { type: 'disabled' },
-      })
-
-      reply = completion.choices[0]?.message?.content
-
-      if (!reply || reply.trim().length === 0) {
-        reply = getFallbackResponse(message)
-      }
+      // Using smart fallback responses
+      // The current free AI models don't work well with Arabic
+      // To enable AI: add credits to OpenRouter account or use a better model
+      reply = getFallbackResponse(message)
     } catch (aiError) {
       // If AI fails, use intelligent fallback
       console.error('AI unavailable, using fallback:', aiError instanceof Error ? aiError.message : 'Unknown error')
